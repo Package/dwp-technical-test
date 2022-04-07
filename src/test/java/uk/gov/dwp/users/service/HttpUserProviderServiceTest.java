@@ -24,7 +24,9 @@ class HttpUserProviderServiceTest {
 
     private static final String TEST_BASE_URL = "https://example.com";
     private static final User[] MOCKED_USERS_ARRAY = MOCKED_USERS.toArray(new User[0]);
+
     private UserProviderService underTest;
+
     @Mock
     private RestTemplate restTemplate;
 
@@ -67,6 +69,42 @@ class HttpUserProviderServiceTest {
         List<User> usersInLondon = underTest.provideUsersInLondon();
 
         assertTrue(usersInLondon.isEmpty());
+        verify(restTemplate).getForEntity(endPoint, User[].class);
+    }
+
+    @Test
+    void provideAllUsers_ReturnsListOfUsers_GivenSuccessfulResponse() {
+        String endPoint = String.format("%s/users", TEST_BASE_URL);
+        when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(MOCKED_USERS_ARRAY,
+                HttpStatus.OK));
+
+        List<User> allUsers = underTest.provideAllUsers();
+
+        assertEquals(MOCKED_USERS_ARRAY.length, allUsers.size());
+        verify(restTemplate).getForEntity(endPoint, User[].class);
+    }
+
+    @Test
+    void provideAllUsers_ReturnsEmptyList_GivenNullResponseBody() {
+        String endPoint = String.format("%s/users", TEST_BASE_URL);
+        when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(null,
+                HttpStatus.OK));
+
+        List<User> allUsers = underTest.provideAllUsers();
+
+        assertTrue(allUsers.isEmpty());
+        verify(restTemplate).getForEntity(endPoint, User[].class);
+    }
+
+    @Test
+    void provideAllUsers_ReturnsListOfUsers_GivenBadResponseStatus() {
+        String endPoint = String.format("%s/users", TEST_BASE_URL);
+        when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(MOCKED_USERS_ARRAY,
+                HttpStatus.NOT_FOUND));
+
+        List<User> allUsers = underTest.provideAllUsers();
+
+        assertTrue(allUsers.isEmpty());
         verify(restTemplate).getForEntity(endPoint, User[].class);
     }
 }

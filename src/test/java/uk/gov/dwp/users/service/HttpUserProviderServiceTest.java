@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 
 import java.util.List;
@@ -38,35 +39,35 @@ class HttpUserProviderServiceTest {
     }
 
     @Test
-    void provideUsers_ReturnsListOfUsers_GivenSuccessfulResponse() {
+    void provideUsersByLocation_ReturnsListOfUsers_GivenSuccessfulResponse() {
         String endPoint = String.format("%s/city/London/users", TEST_BASE_URL);
         when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(MOCKED_USERS_ARRAY,
                 HttpStatus.OK));
 
-        List<User> usersInLondon = underTest.provideUsersInLondon();
+        List<User> usersInLondon = underTest.provideUsersInLocation(Location.LONDON);
 
         assertEquals(MOCKED_USERS_ARRAY.length, usersInLondon.size());
         verify(restTemplate).getForEntity(endPoint, User[].class);
     }
 
     @Test
-    void provideUsers_ReturnsEmptyList_GivenNullResponseBody() {
+    void provideUsersByLocation_ReturnsEmptyList_GivenNullResponseBody() {
         String endPoint = String.format("%s/city/London/users", TEST_BASE_URL);
         when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
 
-        List<User> usersInLondon = underTest.provideUsersInLondon();
+        List<User> usersInLondon = underTest.provideUsersInLocation(Location.LONDON);
 
         assertTrue(usersInLondon.isEmpty());
         verify(restTemplate).getForEntity(endPoint, User[].class);
     }
 
     @Test
-    void provideUsers_ReturnsEmptyList_GivenBadResponseStatus() {
+    void provideUsersByLocation_ReturnsEmptyList_GivenBadResponseStatus() {
         String endPoint = String.format("%s/city/London/users", TEST_BASE_URL);
         when(restTemplate.getForEntity(endPoint, User[].class)).thenReturn(new ResponseEntity<>(null,
                 HttpStatus.NOT_FOUND));
 
-        List<User> usersInLondon = underTest.provideUsersInLondon();
+        List<User> usersInLondon = underTest.provideUsersInLocation(Location.LONDON);
 
         assertTrue(usersInLondon.isEmpty());
         verify(restTemplate).getForEntity(endPoint, User[].class);

@@ -3,6 +3,7 @@ package uk.gov.dwp.users.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 
 import java.util.List;
@@ -14,8 +15,8 @@ public class UserService {
 
     private final UserProviderService userProviderService;
 
-    public List<User> getUsersInLondon() {
-        return userProviderService.provideUsersInLondon();
+    public List<User> getUsersInLocation(Location location) {
+        return userProviderService.provideUsersInLocation(location);
     }
 
     public List<User> getAllUsers() {

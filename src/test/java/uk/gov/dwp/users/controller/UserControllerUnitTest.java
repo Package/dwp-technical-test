@@ -3,9 +3,12 @@ package uk.gov.dwp.users.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 import uk.gov.dwp.users.service.UserService;
 
@@ -30,16 +33,17 @@ class UserControllerUnitTest {
         this.underTest = new UserController(userService);
     }
 
-    @Test
-    void getUsersInLondon_ReturnsAListOfUsers() {
-        when(userService.getUsersInLondon()).thenReturn(MOCKED_USERS);
+    @ParameterizedTest
+    @EnumSource(value = Location.class)
+    void getUsersByLocation_ReturnsAListOfUsers_GivenAValidLocation(Location location) {
+        when(userService.getUsersInLocation(location)).thenReturn(MOCKED_USERS);
 
-        ResponseEntity<List<User>> response = underTest.getUsersInLondon();
+        ResponseEntity<List<User>> response = underTest.getUsersByLocation(location);
         List<User> usersInLondon = response.getBody();
 
         assertNotNull(usersInLondon);
         assertSame(MOCKED_USERS, usersInLondon);
-        verify(userService).getUsersInLondon();
+        verify(userService).getUsersInLocation(location);
     }
 
     @Test

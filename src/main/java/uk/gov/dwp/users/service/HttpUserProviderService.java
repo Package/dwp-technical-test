@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 
 import java.util.Arrays;
@@ -26,8 +27,8 @@ public class HttpUserProviderService implements UserProviderService {
     private String baseUrl;
 
     @Override
-    public List<User> provideUsersInLondon() {
-        String endPoint = String.format("%s/city/London/users", baseUrl);
+    public List<User> provideUsersInLocation(Location location) {
+        String endPoint = String.format("%s/city/%s/users", baseUrl, location.getName());
 
         return this.getListOfUsers(endPoint);
     }

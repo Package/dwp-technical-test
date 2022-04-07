@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 
 import java.util.Collections;
@@ -30,23 +31,23 @@ class UserServiceTest {
     }
 
     @Test
-    void getUsersInLondon_ReturnsAnEmptyList_GivenNoUsers() {
-        when(userProviderService.provideUsersInLondon()).thenReturn(Collections.emptyList());
+    void getUsersInLocation_ReturnsAnEmptyList_GivenNoUsers() {
+        when(userProviderService.provideUsersInLocation(Location.LONDON)).thenReturn(Collections.emptyList());
 
-        List<User> usersInLondon = underTest.getUsersInLondon();
+        List<User> usersInLondon = underTest.getUsersInLocation(Location.LONDON);
 
         assertTrue(usersInLondon.isEmpty());
-        verify(userProviderService).provideUsersInLondon();
+        verify(userProviderService).provideUsersInLocation(Location.LONDON);
     }
 
     @Test
-    void getUsersInLondon_ReturnsListOfUsers_GivenUsersExist() {
-        when(userProviderService.provideUsersInLondon()).thenReturn(MOCKED_USERS);
+    void getUsersInLocation_ReturnsListOfUsers_GivenUsersExist() {
+        when(userProviderService.provideUsersInLocation(Location.LONDON)).thenReturn(MOCKED_USERS);
 
-        List<User> usersInLondon = underTest.getUsersInLondon();
+        List<User> usersInLondon = underTest.getUsersInLocation(Location.LONDON);
 
         assertSame(MOCKED_USERS, usersInLondon);
-        verify(userProviderService).provideUsersInLondon();
+        verify(userProviderService).provideUsersInLocation(Location.LONDON);
     }
 
     @Test

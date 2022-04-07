@@ -48,4 +48,24 @@ class UserServiceTest {
         assertSame(MOCKED_USERS, usersInLondon);
         verify(userProviderService).provideUsersInLondon();
     }
+
+    @Test
+    void getAllUsers_ReturnsListOfUsers_GivenUsersExist() {
+        when(userProviderService.provideAllUsers()).thenReturn(MOCKED_USERS);
+
+        List<User> allUsers = underTest.getAllUsers();
+
+        assertSame(MOCKED_USERS, allUsers);
+        verify(userProviderService).provideAllUsers();
+    }
+
+    @Test
+    void getAllUsers_ReturnsAnEmptyList_GivenNoUsers() {
+        when(userProviderService.provideAllUsers()).thenReturn(Collections.emptyList());
+
+        List<User> allUsers = underTest.getAllUsers();
+
+        assertTrue(allUsers.isEmpty());
+        verify(userProviderService).provideAllUsers();
+    }
 }

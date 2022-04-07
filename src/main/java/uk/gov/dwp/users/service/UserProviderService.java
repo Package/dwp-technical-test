@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface UserProviderService {
     List<User> provideUsersInLondon();
+
+    List<User> provideAllUsers();
 }

@@ -17,6 +17,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+
+        return ResponseEntity.ok(allUsers);
+    }
+
+    @GetMapping("/london")
     public ResponseEntity<List<User>> getUsersInLondon() {
         List<User> usersInLondon = userService.getUsersInLondon();
 

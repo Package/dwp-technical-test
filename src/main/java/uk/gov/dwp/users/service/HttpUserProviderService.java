@@ -46,4 +46,10 @@ public class HttpUserProviderService implements UserProviderService {
         log.info("Got {} users back", responseUsers.length);
         return Arrays.stream(response.getBody()).collect(Collectors.toList());
     }
+
+    @Override
+    public List<User> provideAllUsers() {
+        // Todo
+        return Collections.emptyList();
+    }
 }

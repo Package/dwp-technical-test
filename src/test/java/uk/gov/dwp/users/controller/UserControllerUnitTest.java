@@ -41,4 +41,16 @@ class UserControllerUnitTest {
         assertSame(MOCKED_USERS, usersInLondon);
         verify(userService).getUsersInLondon();
     }
+
+    @Test
+    void getAllUsers_ReturnsAListOfUsers() {
+        when(userService.getAllUsers()).thenReturn(MOCKED_USERS);
+
+        ResponseEntity<List<User>> response = underTest.getAllUsers();
+        List<User> allUsers = response.getBody();
+
+        assertNotNull(allUsers);
+        assertSame(MOCKED_USERS, allUsers);
+        verify(userService).getAllUsers();
+    }
 }

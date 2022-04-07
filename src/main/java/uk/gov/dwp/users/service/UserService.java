@@ -18,4 +18,8 @@ public class UserService {
         return userProviderService.provideUsersInLondon();
     }
 
+    public List<User> getAllUsers() {
+        return userProviderService.provideAllUsers();
+    }
+
 }

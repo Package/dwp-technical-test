@@ -1,6 +1,7 @@
 package uk.gov.dwp.users.configuration;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,6 +17,13 @@ public class ControllerExceptionConfig {
     @ExceptionHandler(LocationBadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse locationBadRequestException(LocationBadRequestException exception) {
+        return ErrorResponseFactory.badRequest(exception.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse locationBadRequestException(MissingServletRequestParameterException exception) {
         return ErrorResponseFactory.badRequest(exception.getMessage());
     }
 }

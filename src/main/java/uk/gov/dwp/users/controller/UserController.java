@@ -10,7 +10,6 @@ import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 import uk.gov.dwp.users.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/location")
-    public ResponseEntity<List<User>> getUsersByLocation(@Valid @RequestParam(name = "name") Location location) {
+    public ResponseEntity<List<User>> getUsersByLocation(@RequestParam(name = "name") Location location) {
         List<User> usersInLondon = userService.getUsersInLocation(location);
 
         return ResponseEntity.ok(usersInLondon);

@@ -18,7 +18,7 @@ public class StringToLocationConverterConfig implements Converter<String, Locati
             return Location.valueOf(source.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException exception) {
             log.error("Error trying to convert {} to Location", source);
-            throw new LocationBadRequestException("Location Not Supported: " + source);
+            throw new LocationBadRequestException("Location not supported: " + source);
         }
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.dwp.users.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,10 @@ public class User {
 
     @JsonProperty("longitude")
     private double longitude;
+
+    @JsonProperty("city")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String city;
 
     @JsonIgnore
     public Coordinate getCoordinates() {

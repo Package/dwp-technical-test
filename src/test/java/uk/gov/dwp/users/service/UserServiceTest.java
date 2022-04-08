@@ -37,13 +37,9 @@ class UserServiceTest {
     @Mock
     private DistanceService distanceService;
 
-    private static Stream<Arguments> provideUsersToCombine() {
-        return Stream.of(
-                Arguments.of(MOCKED_USERS, MOCKED_USERS, MOCKED_USERS.size()),
-                Arguments.of(List.of(new User()), Collections.emptyList(), 1),
-                Arguments.of(List.of(MOCKED_USERS.get(1)), List.of(MOCKED_USERS.get(2)), 2),
-                Arguments.of(Collections.emptyList(), Collections.emptyList(), 0)
-        );
+    @BeforeEach
+    void setUp() {
+        this.underTest = new UserService(userProviderService, distanceService);
     }
 
     @Test
@@ -110,11 +106,6 @@ class UserServiceTest {
         verify(userProviderService).provideUserById(invalidId);
     }
 
-    @BeforeEach
-    void setUp() {
-        this.underTest = new UserService(userProviderService, distanceService);
-    }
-
     @ParameterizedTest
     @ValueSource(doubles = {50.1, 51.0, 100.0, 1000.0})
     void getUsersNearbyLocation_ReturnsNoUsers_WhenAllUsersAreNotNearby(double distanceToReturn) {
@@ -165,5 +156,14 @@ class UserServiceTest {
         List<User> combinedList = underTest.combineUsers(firstList, secondList);
 
         assertEquals(expectedCombinedSize, combinedList.size());
+    }
+
+    private static Stream<Arguments> provideUsersToCombine() {
+        return Stream.of(
+                Arguments.of(MOCKED_USERS, MOCKED_USERS, MOCKED_USERS.size()),
+                Arguments.of(List.of(new User()), Collections.emptyList(), 1),
+                Arguments.of(List.of(MOCKED_USERS.get(1)), List.of(MOCKED_USERS.get(2)), 2),
+                Arguments.of(Collections.emptyList(), Collections.emptyList(), 0)
+        );
     }
 }

@@ -15,15 +15,6 @@ class HaversineDistanceServiceTest {
 
     private DistanceService underTest;
 
-    private static Stream<Arguments> provideLocationsAndDistance() {
-        return Stream.of(
-                Arguments.of(Location.LONDON, Location.LONDON, 0.0),
-                Arguments.of(Location.MANCHESTER, Location.LONDON, 163.0),
-                Arguments.of(Location.NEWCASTLE, Location.LONDON, 248.0),
-                Arguments.of(Location.BLACKPOOL, Location.MANCHESTER, 40.0)
-        );
-    }
-
     @BeforeEach
     void setUp() {
         this.underTest = new HaversineDistanceService();
@@ -39,5 +30,14 @@ class HaversineDistanceServiceTest {
         double distanceResult = underTest.distanceBetweenCoordinatesInMiles(start, end);
 
         assertEquals(approximateHaversineDistance, distanceResult);
+    }
+
+    private static Stream<Arguments> provideLocationsAndDistance() {
+        return Stream.of(
+                Arguments.of(Location.LONDON, Location.LONDON, 0.0),
+                Arguments.of(Location.MANCHESTER, Location.LONDON, 163.0),
+                Arguments.of(Location.NEWCASTLE, Location.LONDON, 248.0),
+                Arguments.of(Location.BLACKPOOL, Location.MANCHESTER, 40.0)
+        );
     }
 }

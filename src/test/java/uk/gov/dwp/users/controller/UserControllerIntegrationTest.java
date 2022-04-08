@@ -45,8 +45,8 @@ class UserControllerIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(Location.class)
-    void getUsersByLocation_ReturnsUsers_GivenAValidLocation(Location location) throws Exception {
-        when(userService.getUsersInLocation(location)).thenReturn(MOCKED_USERS);
+    void getUsersInOrNearbyLocation_ReturnsUsers_GivenAValidLocation(Location location) throws Exception {
+        when(userService.getUsersInOrNearbyLocation(location)).thenReturn(MOCKED_USERS);
 
         mockMvc.perform(get("/api/v1/users/location?name=" + location.getName()))
                 .andDo(log())
@@ -54,7 +54,7 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(MOCKED_USERS.size()));
 
-        verify(userService).getUsersInLocation(location);
+        verify(userService).getUsersInOrNearbyLocation(location);
     }
 
     @ParameterizedTest

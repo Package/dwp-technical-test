@@ -3,8 +3,14 @@ package uk.gov.dwp.users.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.dwp.users.domain.Coordinate;
 import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 import uk.gov.dwp.users.exception.UserNotFoundException;
@@ -12,10 +18,11 @@ import uk.gov.dwp.users.exception.UserNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static uk.gov.dwp.users.data.MockUserData.FIRST_USER;
 import static uk.gov.dwp.users.data.MockUserData.MOCKED_USERS;
 
@@ -27,9 +34,16 @@ class UserServiceTest {
     @Mock
     private UserProviderService userProviderService;
 
-    @BeforeEach
-    void setUp() {
-        this.underTest = new UserService(userProviderService);
+    @Mock
+    private DistanceService distanceService;
+
+    private static Stream<Arguments> provideUsersToCombine() {
+        return Stream.of(
+                Arguments.of(MOCKED_USERS, MOCKED_USERS, MOCKED_USERS.size()),
+                Arguments.of(List.of(new User()), Collections.emptyList(), 1),
+                Arguments.of(List.of(MOCKED_USERS.get(1)), List.of(MOCKED_USERS.get(2)), 2),
+                Arguments.of(Collections.emptyList(), Collections.emptyList(), 0)
+        );
     }
 
     @Test
@@ -94,5 +108,62 @@ class UserServiceTest {
         assertInstanceOf(UserNotFoundException.class, exception);
         assertEquals("User not found with ID: " + invalidId, exception.getMessage());
         verify(userProviderService).provideUserById(invalidId);
+    }
+
+    @BeforeEach
+    void setUp() {
+        this.underTest = new UserService(userProviderService, distanceService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {50.1, 51.0, 100.0, 1000.0})
+    void getUsersNearbyLocation_ReturnsNoUsers_WhenAllUsersAreNotNearby(double distanceToReturn) {
+        when(userProviderService.provideAllUsers()).thenReturn(MOCKED_USERS);
+        when(distanceService.distanceBetweenCoordinatesInMiles(any(Coordinate.class), any(Coordinate.class)))
+                .thenReturn(distanceToReturn);
+
+        List<User> nearbyUsers = underTest.getUsersNearbyLocation(Location.NEWCASTLE);
+
+        assertEquals(0, nearbyUsers.size());
+        verify(userProviderService).provideAllUsers();
+        verify(distanceService, times(MOCKED_USERS.size()))
+                .distanceBetweenCoordinatesInMiles(any(Coordinate.class), any(Coordinate.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {25.0, 0.0, 50.0, 49.99})
+    void getUsersNearbyLocation_ReturnsAllUsers_WhenAllUsersAreNearby(double distanceToReturn) {
+        when(userProviderService.provideAllUsers()).thenReturn(MOCKED_USERS);
+        when(distanceService.distanceBetweenCoordinatesInMiles(any(Coordinate.class), any(Coordinate.class)))
+                .thenReturn(distanceToReturn);
+
+        List<User> nearbyUsers = underTest.getUsersNearbyLocation(Location.LONDON);
+
+        assertEquals(MOCKED_USERS.size(), nearbyUsers.size());
+        verify(userProviderService).provideAllUsers();
+        verify(distanceService, times(MOCKED_USERS.size()))
+                .distanceBetweenCoordinatesInMiles(any(Coordinate.class), any(Coordinate.class));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Location.class)
+    void getUsersInOrNearbyLocation_ReturnsAllUsers_WhenLocationIsValid(Location location) {
+        when(userProviderService.provideAllUsers()).thenReturn(MOCKED_USERS);
+        when(userProviderService.provideUsersInLocation(location)).thenReturn(MOCKED_USERS);
+
+        List<User> usersInOrNearbyLocation = underTest.getUsersInOrNearbyLocation(location);
+
+        assertEquals(MOCKED_USERS.size(), usersInOrNearbyLocation.size());
+        verify(userProviderService).provideAllUsers();
+        verify(userProviderService).provideUsersInLocation(location);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUsersToCombine")
+    void combineUsers_ReturnsUniqueListOfUsers_GivenMultipleListsOfUsers(List<User> firstList, List<User> secondList,
+                                                                         int expectedCombinedSize) {
+        List<User> combinedList = underTest.combineUsers(firstList, secondList);
+
+        assertEquals(expectedCombinedSize, combinedList.size());
     }
 }

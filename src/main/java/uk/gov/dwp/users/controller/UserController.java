@@ -24,9 +24,9 @@ public class UserController {
 
     @GetMapping("/location")
     public ResponseEntity<List<User>> getUsersByLocation(@RequestParam(name = "name") Location location) {
-        List<User> usersInLondon = userService.getUsersInLocation(location);
+        List<User> usersInOrNearby = userService.getUsersInOrNearbyLocation(location);
 
-        return ResponseEntity.ok(usersInLondon);
+        return ResponseEntity.ok(usersInOrNearby);
     }
 
     @GetMapping("/{userId}")

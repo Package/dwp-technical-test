@@ -43,9 +43,8 @@ public class HttpUserProviderService implements UserProviderService {
 
     @Override
     public Optional<User> provideUserById(int userId) {
-        log.info("Finding a user with ID: {}", userId);
-
         String endPoint = String.format("%s/user/%d", baseUrl, userId);
+        log.info("Providing user from: {}", endPoint);
 
         Optional<User> user = this.makeRequest(endPoint, User.class);
         if (user.isEmpty()) {

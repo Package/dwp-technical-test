@@ -14,8 +14,7 @@ import uk.gov.dwp.users.service.UserService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.dwp.users.data.MockUserData.FIRST_USER;
@@ -36,15 +35,15 @@ class UserControllerUnitTest {
 
     @ParameterizedTest
     @EnumSource(value = Location.class)
-    void getUsersByLocation_ReturnsAListOfUsers_GivenAValidLocation(Location location) {
-        when(userService.getUsersInLocation(location)).thenReturn(MOCKED_USERS);
+    void getUsersInOrNearbyLocation_ReturnsAListOfUsers_GivenAValidLocation(Location location) {
+        when(userService.getUsersInOrNearbyLocation(location)).thenReturn(MOCKED_USERS);
 
         ResponseEntity<List<User>> response = underTest.getUsersByLocation(location);
         List<User> usersInLondon = response.getBody();
 
         assertNotNull(usersInLondon);
-        assertSame(MOCKED_USERS, usersInLondon);
-        verify(userService).getUsersInLocation(location);
+        assertEquals(MOCKED_USERS.size(), usersInLondon.size());
+        verify(userService).getUsersInOrNearbyLocation(location);
     }
 
     @Test

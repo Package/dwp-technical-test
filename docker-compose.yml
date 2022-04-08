@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  dwp-users-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dwp-users-api
+    ports:
+      - "8080:8080"

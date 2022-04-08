@@ -40,6 +40,12 @@ public class HttpUserProviderService implements UserProviderService {
         return this.getListOfUsers(endPoint);
     }
 
+    @Override
+    public Optional<User> provideUserById(int userId) {
+        // Todo
+        return Optional.empty();
+    }
+
     private List<User> getListOfUsers(String endPoint) {
         log.info("Providing users from: {}", endPoint);
 

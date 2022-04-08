@@ -7,14 +7,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
+import uk.gov.dwp.users.exception.UserNotFoundException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.dwp.users.data.MockUserData.FIRST_USER;
 import static uk.gov.dwp.users.data.MockUserData.MOCKED_USERS;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,5 +70,29 @@ class UserServiceTest {
 
         assertTrue(allUsers.isEmpty());
         verify(userProviderService).provideAllUsers();
+    }
+
+    @Test
+    void getUserById_ReturnsAUser_GivenValidId() {
+        int validId = 1;
+        when(userProviderService.provideUserById(validId)).thenReturn(Optional.of(FIRST_USER));
+
+        User user = underTest.getUserById(validId);
+
+        assertEquals(FIRST_USER.getId(), user.getId());
+        assertSame(FIRST_USER, user);
+        verify(userProviderService).provideUserById(validId);
+    }
+
+    @Test
+    void getUserById_ThrowsNotFoundException_GivenAnInvalidId() {
+        int invalidId = 999999;
+        when(userProviderService.provideUserById(invalidId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UserNotFoundException.class, () -> underTest.getUserById(invalidId));
+
+        assertInstanceOf(UserNotFoundException.class, exception);
+        assertEquals("User not found with ID: " + invalidId, exception.getMessage());
+        verify(userProviderService).provideUserById(invalidId);
     }
 }

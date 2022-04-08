@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.dwp.users.data.MockUserData.FIRST_USER;
 import static uk.gov.dwp.users.data.MockUserData.MOCKED_USERS;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,5 +57,18 @@ class UserControllerUnitTest {
         assertNotNull(allUsers);
         assertSame(MOCKED_USERS, allUsers);
         verify(userService).getAllUsers();
+    }
+
+    @Test
+    void getUserById_ReturnsAUser_GivenAValidId() {
+        int validId = 100;
+        when(userService.getUserById(validId)).thenReturn(FIRST_USER);
+
+        ResponseEntity<User> response = underTest.getUserById(validId);
+        User user = response.getBody();
+
+        assertNotNull(user);
+        assertSame(FIRST_USER, user);
+        verify(userService).getUserById(validId);
     }
 }

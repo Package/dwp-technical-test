@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uk.gov.dwp.users.domain.http.ErrorResponse;
 import uk.gov.dwp.users.domain.http.ErrorResponseFactory;
 import uk.gov.dwp.users.exception.LocationBadRequestException;
+import uk.gov.dwp.users.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class ControllerExceptionConfig {
@@ -23,7 +24,14 @@ public class ControllerExceptionConfig {
     @ResponseBody
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse locationBadRequestException(MissingServletRequestParameterException exception) {
+    public ErrorResponse missingServletRequestParameterException(MissingServletRequestParameterException exception) {
         return ErrorResponseFactory.badRequest(exception.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse userNotFoundException(UserNotFoundException exception) {
+        return ErrorResponseFactory.notFound(exception.getMessage());
     }
 }

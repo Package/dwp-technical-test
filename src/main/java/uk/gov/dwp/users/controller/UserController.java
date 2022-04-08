@@ -2,10 +2,7 @@ package uk.gov.dwp.users.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
 import uk.gov.dwp.users.service.UserService;
@@ -30,5 +27,12 @@ public class UserController {
         List<User> usersInLondon = userService.getUsersInLocation(location);
 
         return ResponseEntity.ok(usersInLondon);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable Integer userId) {
+        User user = userService.getUserById(userId);
+
+        return ResponseEntity.ok(user);
     }
 }

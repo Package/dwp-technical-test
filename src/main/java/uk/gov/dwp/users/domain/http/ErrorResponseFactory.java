@@ -10,4 +10,8 @@ public class ErrorResponseFactory {
     public static ErrorResponse badRequest(String message) {
         return new ErrorResponse(message, HttpStatus.BAD_REQUEST);
     }
+
+    public static ErrorResponse notFound(String message) {
+        return new ErrorResponse(message, HttpStatus.NOT_FOUND);
+    }
 }

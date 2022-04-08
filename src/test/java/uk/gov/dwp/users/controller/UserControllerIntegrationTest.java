@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.dwp.users.domain.Location;
+import uk.gov.dwp.users.exception.UserNotFoundException;
 import uk.gov.dwp.users.service.UserService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.dwp.users.data.MockUserData.FIRST_USER;
 import static uk.gov.dwp.users.data.MockUserData.MOCKED_USERS;
 
 @WebMvcTest
@@ -75,5 +77,33 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.statusCode").value("BAD_REQUEST"));
 
         verify(userService, never()).getUsersInLocation(any(Location.class));
+    }
+
+    @Test
+    void getUserById_ReturnsAUser_GivenAValidId() throws Exception {
+        int validId = FIRST_USER.getId();
+        when(userService.getUserById(validId)).thenReturn(FIRST_USER);
+
+        mockMvc.perform(get("/api/v1/users/" + validId))
+                .andDo(log())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.id").value(validId));
+
+        verify(userService).getUserById(validId);
+    }
+
+    @Test
+    void getUserById_ThrowsNotFoundException_GivenAnInvalidId() throws Exception {
+        int invalidId = 999999;
+        when(userService.getUserById(invalidId)).thenThrow(
+                new UserNotFoundException("User not found with ID: " + invalidId));
+
+        mockMvc.perform(get("/api/v1/users/" + invalidId))
+                .andDo(log())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.statusCode").value("NOT_FOUND"));
+
+        verify(userService).getUserById(invalidId);
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
+import uk.gov.dwp.users.exception.UserNotFoundException;
 
 import java.util.List;
 
@@ -23,4 +24,8 @@ public class UserService {
         return userProviderService.provideAllUsers();
     }
 
+    public User getUserById(int userId) {
+        return userProviderService.provideUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
 }

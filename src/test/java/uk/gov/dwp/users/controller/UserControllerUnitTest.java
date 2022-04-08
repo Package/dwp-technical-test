@@ -39,10 +39,10 @@ class UserControllerUnitTest {
         when(userService.getUsersInOrNearbyLocation(location)).thenReturn(MOCKED_USERS);
 
         ResponseEntity<List<User>> response = underTest.getUsersByLocation(location);
-        List<User> usersInLondon = response.getBody();
+        List<User> usersInLocation = response.getBody();
 
-        assertNotNull(usersInLondon);
-        assertEquals(MOCKED_USERS.size(), usersInLondon.size());
+        assertNotNull(usersInLocation);
+        assertEquals(MOCKED_USERS.size(), usersInLocation.size());
         verify(userService).getUsersInOrNearbyLocation(location);
     }
 

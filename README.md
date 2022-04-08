@@ -54,7 +54,7 @@ Once up and running the API will be accessible from: `http://localhost:8080`
 
 ### Manual Setup
 
-Open the project in your editor of choice. If using IntelliJ the dependencies in `pom.xml` should be resolved
+Open the project in your IDE of choice. If using IntelliJ the dependencies in `pom.xml` should be resolved
 automatically.
 
 You can also install dependencies manually via: `mvn install`.
@@ -100,7 +100,7 @@ The API endpoints supported are also described below.
 
 `200` - on success
 
-`400` - not found if invalid location
+`400` - bad request if invalid location
 
 ---
 

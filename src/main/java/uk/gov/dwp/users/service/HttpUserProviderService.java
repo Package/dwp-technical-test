@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.dwp.users.domain.Location;
 import uk.gov.dwp.users.domain.User;
@@ -42,14 +43,23 @@ public class HttpUserProviderService implements UserProviderService {
 
     @Override
     public Optional<User> provideUserById(int userId) {
-        // Todo
-        return Optional.empty();
+        log.info("Finding a user with ID: {}", userId);
+
+        String endPoint = String.format("%s/user/%d", baseUrl, userId);
+
+        Optional<User> user = this.makeRequest(endPoint, User.class);
+        if (user.isEmpty()) {
+            log.warn("No user found with ID: {}", userId);
+            return Optional.empty();
+        }
+
+        return user;
     }
 
     private List<User> getListOfUsers(String endPoint) {
         log.info("Providing users from: {}", endPoint);
 
-        Optional<User[]> users = this.makeRequest(endPoint);
+        Optional<User[]> users = this.makeRequest(endPoint, User[].class);
         if (users.isEmpty()) {
             log.warn("Got 0 users back");
             return Collections.emptyList();
@@ -59,21 +69,27 @@ public class HttpUserProviderService implements UserProviderService {
         return Arrays.stream(users.get()).collect(Collectors.toList());
     }
 
-    private Optional<User[]> makeRequest(String endPoint) {
-        ResponseEntity<User[]> response = restTemplate.getForEntity(endPoint, User[].class);
-        HttpStatus responseStatus = response.getStatusCode();
-        User[] responseUsers = response.getBody();
+    private <T> Optional<T> makeRequest(String endPoint, Class<T> className) {
+        try {
+            ResponseEntity<T> response = restTemplate.getForEntity(endPoint, className);
+            HttpStatus responseStatus = response.getStatusCode();
+            T responseBody = response.getBody();
 
-        if (responseStatus != HttpStatus.OK) {
-            log.error("Error - HTTP response was not OK, got: {}", responseStatus);
-            return Optional.empty();
+            if (responseStatus != HttpStatus.OK) {
+                log.error("Error - HTTP response was not OK, got: {}", responseStatus);
+                return Optional.empty();
+            }
+
+            if (responseBody == null) {
+                log.error("Error - HTTP response body is null");
+                return Optional.empty();
+            }
+
+            return Optional.of(responseBody);
+        } catch (HttpClientErrorException exception) {
+            log.error("Error - exception caught making HTTP call: {}", exception.getMessage());
         }
 
-        if (responseUsers == null) {
-            log.error("Error - HTTP response body is null");
-            return Optional.empty();
-        }
-
-        return Optional.of(responseUsers);
+        return Optional.empty();
     }
 }

@@ -1,12 +1,13 @@
 FROM adoptopenjdk/openjdk11:alpine
 
+RUN apk add --no-cache maven
+
 WORKDIR /app
 
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+COPY pom.xml ./
 
-RUN ./mvnw dependency:go-offline
+RUN mvn dependency:go-offline
 
 COPY src ./src
 
-CMD ["./mvnw", "spring-boot:run"]
+CMD ["mvn", "spring-boot:run"]
